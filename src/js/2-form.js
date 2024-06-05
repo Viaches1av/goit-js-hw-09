@@ -1,37 +1,39 @@
-const formData = {
-  email: '',
-  message: '',
-};
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.querySelector('.feedback-form');
+  const emailInput = form.querySelector('input[name="email"]');
+  const messageInput = form.querySelector('textarea[name="message"]');
 
-const form = document.querySelector('.feedback-form');
-const emailInput = form.querySelector('input[name = "email"]');
+  const saveToLocalStorage = () => {
+    const formData = {
+      email: emailInput.value,
+      message: messageInput.value,
+    };
+    localStorage.setItem('feedback-form-state', JSON.stringify(formData));
+  };
 
-const messageInput = form.querySelector('textarea[name = "message"]');
+  const uploadForm = () => {
+    const savedData = localStorage.getItem('feedback-form-state');
+    if (savedData) {
+      const { email, message } = JSON.parse(savedData);
+      emailInput.value = email;
+      messageInput.value = message;
+    }
+  };
 
-const savetoLocalStorage = () => {
-  localStorage.setItem('feedback-form-state', JSON.stringify(formData));
-};
+  uploadForm();
 
-const uploadForm = () => {
-  const savedData = localStorage.getItem('feedback-form-state');
-  if (savedData) {
-    const { email, message } = JSON.parse(savedData);
-    emailInput.value = email;
-    messageInput.value = message;
-    formData.email = email;
-    formData.message = message;
-  }
-};
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    const email = emailInput.value.trim();
+    const message = messageInput.value.trim();
+    if (!email || !message) {
+      alert('Please fill in all fields.');
+      return;
+    }
+    console.log('Form data:', { email, message });
+    localStorage.removeItem('feedback-form-state');
+    form.reset();
+  });
 
-document.addEventListener('DOMContentLoaded', uploadForm);
-
-form.addEventListener('submit', event => {
-  event.preventDefault();
-  if (!formData.email || !formData.message) {
-    alert('Fill please all fields');
-    return;
-  }
-  console.log('Form data:', formData);
-  localStorage.removeItem('feedback-form-state');
-  (formData.email = ''), (formData.message = ''), form.reset();
+  form.addEventListener('input', saveToLocalStorage);
 });
